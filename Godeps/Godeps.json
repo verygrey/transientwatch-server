@@ -1,0 +1,19 @@
+{
+	"ImportPath": "transientwatch",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/gin-gonic/gin",
+			"Comment": "v0.6",
+			"Rev": "e2fa89777e344782ef5d31929f095f4589c35dcc"
+		},
+		{
+			"ImportPath": "github.com/julienschmidt/httprouter",
+			"Rev": "999ba04938b528fb4fb859231ee929958b8db4a6"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Rev": "d67e0b7d1797975196499f79bcc322c08b9f218b"
+		}
+	]
+}
