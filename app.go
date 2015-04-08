@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hashmap/transientwatch/core"
 	"log"
 	"net/http"
 	"os"
@@ -14,8 +15,23 @@ const (
 	DEFAULT_HOST = "localhost"
 )
 
+var out chan core.Record = make(chan core.Record)
+var ds *core.DataStore = core.NewDataStore(5)
+
 func GetFeed(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"id": 1, "url": "http://www.ibm.com"})
+	c.JSON(http.StatusOK, ds.Slice())
+}
+
+func crawl() {
+	go core.PollFeed("http://www.astronomerstelegram.org/?rss", 5, nil, out)
+}
+
+func receive() {
+	for {
+		rec := <-out
+		ds.Add(&rec)
+		log.Println("GOT: %s", rec.Title)
+	}
 }
 
 func main() {
@@ -28,6 +44,9 @@ func main() {
 	if host = os.Getenv("VCAP_APP_HOST"); len(host) == 0 {
 		host = DEFAULT_HOST
 	}
+
+	crawl()
+	go receive()
 
 	r := gin.Default()
 	r.GET("/feed", GetFeed)

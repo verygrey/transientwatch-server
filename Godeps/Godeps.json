@@ -1,11 +1,19 @@
 {
-	"ImportPath": "transientwatch",
+	"ImportPath": "github.com/hashmap/transientwatch",
 	"GoVersion": "go1.3.3",
 	"Deps": [
 		{
 			"ImportPath": "github.com/gin-gonic/gin",
 			"Comment": "v0.6",
 			"Rev": "e2fa89777e344782ef5d31929f095f4589c35dcc"
+		},
+		{
+			"ImportPath": "github.com/jteeuwen/go-pkg-rss",
+			"Rev": "5576b8d83ed75cbb4bc43ef18c07414f880b3472"
+		},
+		{
+			"ImportPath": "github.com/jteeuwen/go-pkg-xmlx",
+			"Rev": "cf505b97c711dd1c5a4682f68ea04dd35e385b8f"
 		},
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
