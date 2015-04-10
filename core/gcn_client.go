@@ -10,20 +10,20 @@ import (
 )
 
 func PollGCN(timeout, limit int, out chan Record) {
-	startMark := "<!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX>"
-	endMark := "<!YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY>"
+	startMark := "<!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX>\n"
+	endMark := "\n<!YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY>"
 	for {
-		page, err := GetPage("http://gcn.gsfc.nasa.gov/gcn/gcn3_archive.html")
+		//page, err := GetPage("http://gcn.gsfc.nasa.gov/gcn/gcn3_archive.html")
+		pageb, err := ioutil.ReadFile("/Users/alex/Downloads/gcn1.html")
 		if err != nil {
 			log.Println("HTTP error ", err)
 		} else {
-			if strings.TrimSpace(page) == "" {
-				continue
-			}
+			page := string(pageb)
 			log.Println("End mark ", endMark)
 			lines := ExtractArea(page, startMark, endMark, limit)
 			if lines[0] != "" {
-				endMark = lines[0]
+				log.Println("Processing ", lines[0])
+				endMark = "\n" + lines[0]
 				processLines(lines, out)
 			}
 		}
@@ -62,7 +62,7 @@ func ExtractArea(page, startMark, endMark string, limit int) []string {
 	if len(lines) < limit {
 		return lines
 	}
-	return lines[1:limit]
+	return lines[:limit]
 }
 
 func GetPage(url string) (string, error) {
