@@ -67,13 +67,3 @@ func (ds *DataStore) dump() {
 
 	}
 }
-
-func main() {
-	ds := NewDataStore(3)
-	strs := []string{"1", "2", "3", "4", "5"}
-	for _, v := range strs {
-		ds.Add(&Record{v, v, v, v, v})
-		fmt.Println(ds)
-		ds.dump()
-	}
-}

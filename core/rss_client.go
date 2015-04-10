@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-func PollFeed(uri string, timeout int, cr xmlx.CharsetFunc, out chan Record) {
-	feed := rss.New(timeout, true, chanHandler, makeItemHandler(out))
+func PollFeed(uri string, timeout int, cr xmlx.CharsetFunc, out chan Record, limit int, source string) {
+	feed := rss.New(timeout, true, chanHandler, makeItemHandler(out, limit, source))
 
 	for {
 		if err := feed.Fetch(uri, cr); err != nil {
@@ -28,13 +28,23 @@ func chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {
 	log.Printf("%d new channel(s) in %s\n", len(newchannels), feed.Url)
 }
 
-func makeItemHandler(out chan Record) func(*rss.Feed, *rss.Channel, []*rss.Item) {
+func makeItemHandler(out chan Record, limit int, source string) func(*rss.Feed, *rss.Channel, []*rss.Item) {
 	return func(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
 		log.Printf("%d new item(s) in %s\n", len(newitems), feed.Url)
-		for _, v := range newitems {
-			//out <- Record{v.Title, v.Description, v.Source.Text, v.Source.Url, v.PubDate}
+		for i, v := range newitems {
+			if i > limit {
+				break
+			}
 			v := v
-			defer func() { out <- Record{v.Title, v.Description, "", "", v.PubDate} }()
+			body := v.Description
+			if body == "" {
+				body = v.Content.Text
+			}
+			link := feed.Url
+			if v.Links != nil && len(v.Links) > 0 {
+				link = v.Links[0].Href
+			}
+			defer func() { out <- Record{v.Title, body, source, link, v.PubDate} }()
 		}
 	}
 }
