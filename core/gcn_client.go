@@ -13,12 +13,12 @@ func PollGCN(timeout, limit int, out chan Record) {
 	startMark := "<!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX>\n"
 	endMark := "\n<!YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY>"
 	for {
-		//page, err := GetPage("http://gcn.gsfc.nasa.gov/gcn/gcn3_archive.html")
-		pageb, err := ioutil.ReadFile("/Users/alex/Downloads/gcn1.html")
+		page, err := GetPage("http://gcn.gsfc.nasa.gov/gcn/gcn3_archive.html")
+		//pageb, err := ioutil.ReadFile("/Users/alex/Downloads/gcn1.html")
 		if err != nil {
 			log.Println("HTTP error ", err)
 		} else {
-			page := string(pageb)
+			//page := string(pageb)
 			log.Println("End mark ", endMark)
 			lines := ExtractArea(page, startMark, endMark, limit)
 			if lines[0] != "" {
@@ -58,7 +58,13 @@ func extractData(rx *regexp.Regexp, line string) (out string) {
 func ExtractArea(page, startMark, endMark string, limit int) []string {
 	page = strings.TrimSpace(page)
 	log.Println("Page length ", len(page), " start ", startMark, " end ", endMark)
-	lines := strings.Split(page[strings.Index(page, startMark)+len(startMark):strings.Index(page, endMark)], "\n")
+	startArea := strings.Index(page, startMark) + len(startMark)
+	endArea := strings.Index(page, endMark)
+	log.Println("Extractinh area from ", startArea, " to ", endArea)
+	if startArea > endArea {
+		return make([]string, 1)
+	}
+	lines := strings.Split(page[startArea:endArea], "\n")
 	if len(lines) < limit {
 		return lines
 	}

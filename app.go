@@ -16,7 +16,7 @@ const (
 )
 
 var out chan core.Record = make(chan core.Record)
-var ds *core.DataStore = core.NewDataStore(100)
+var ds *core.DataStore = core.NewDataStore(300)
 
 func GetFeed(c *gin.Context) {
 	c.JSON(http.StatusOK, ds.Slice())
@@ -29,7 +29,7 @@ func crawl() {
 	go core.PollFeed("http://www.astronomerstelegram.org/?rss+Gamma-Ray%20Burst", 5, nil, out, 10, "The Astronomer's Telegram")
 	go core.PollFeed("http://www.astronomerstelegram.org/?rss+Transient", 5, nil, out, 10, "The Astronomer's Telegram")
 	go core.PollFeed("http://www.cbat.eps.harvard.edu/unconf/tocp.xml", 5, nil, out, 10, "Central Bureau for Astronomical Telegrams")
-	go core.PollGCN(1, 30, out)
+	go core.PollGCN(5, 30, out)
 }
 
 func receive() {
