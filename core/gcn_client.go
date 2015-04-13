@@ -38,9 +38,11 @@ func processLines(lines []string, out chan Record) {
 	for _, line := range lines {
 		line := line
 		defer func() {
-			out <- Record{"GCN Circular " + extractData(idRx, line),
+			title := "GCN Circular " + extractData(idRx, line)
+			out <- Record{Srand(), title,
 				extractData(descrRx, line), "GCN Circulars",
 				"http://gcn.gsfc.nasa.gov/" + extractData(hrefRx, line), ""}
+			SendPushNotification(title)
 		}()
 	}
 }

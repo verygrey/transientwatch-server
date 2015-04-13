@@ -1,8 +1,15 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"math/rand"
+	"net/http"
+	"strings"
+)
 
 type Record struct {
+	Id      string
 	Title   string
 	Body    string
 	Source  string
@@ -21,6 +28,43 @@ type DataStore struct {
 	Tail     *Node
 	Capacity int
 	Size     int
+}
+
+var alpha = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+func Srand() string {
+	return SrandN(20)
+}
+
+// generates a random string of fixed size
+func SrandN(size int) string {
+	buf := make([]byte, size)
+	for i := 0; i < size; i++ {
+		buf[i] = alpha[rand.Intn(len(alpha))]
+	}
+	return string(buf)
+}
+
+func SendPushNotification(text string) {
+	url := "https://mobile.ng.bluemix.net:443/push/v1/apps/c178f6c2-be4b-4a14-a16d-ecb00da18089/messages"
+	secret := "96cdaf6a61c377a6301c7022288236d30c41c290"
+	body := fmt.Sprintf(`{"message": {"alert":"%s"}}`, text)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
+	if err != nil {
+		log.Println("Error creating request", err)
+	}
+	req.Header.Add("IBM-Application-Secret", secret)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error sending request", err)
+	}
+	if resp.StatusCode == 202 {
+		log.Println("Push message was sent: ", text)
+	} else {
+		log.Println("Error sending push ", resp.StatusCode, " ", text)
+	}
 }
 
 func NewDataStore(capacity int) *DataStore {

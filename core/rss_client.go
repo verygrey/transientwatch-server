@@ -44,7 +44,10 @@ func makeItemHandler(out chan Record, limit int, source string) func(*rss.Feed, 
 			if v.Links != nil && len(v.Links) > 0 {
 				link = v.Links[0].Href
 			}
-			defer func() { out <- Record{v.Title, body, source, link, v.PubDate} }()
+			defer func() {
+				out <- Record{Srand(), v.Title, body, source, link, v.PubDate}
+				SendPushNotification(v.Title)
+			}()
 		}
 	}
 }
